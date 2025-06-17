@@ -1,7 +1,25 @@
 # DRWEBQUEST
 Realization on Python test assignments for dr web. This repo represents DB for the task with transactions.
 
-
+to install all dependensies run:
+___
+if Linux or Windows:
+```bash
+pip install -r requirements.txt 
+```
+if MacOS:
+```bash
+pip3 install -r requirements.txt 
+```
+___
+Run in terminal:
+```bash
+python main.py
+```
+MacOS:
+```bash
+python3 main.py
+```
 The Task:
 
 
