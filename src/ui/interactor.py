@@ -45,7 +45,8 @@ class InterActor:
 
         if len(self.params) != arg_count:
             print(
-                f"Ошибка: команда {self.command.value} требует {arg_count} аргументов"
+                f"Ошибка: команда {self.command.value}"
+                f" требует {arg_count} аргументов"
             )
             return
         result: bool = handler(*self.params)
