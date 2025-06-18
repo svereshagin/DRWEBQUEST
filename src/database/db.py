@@ -84,7 +84,7 @@ class InMemoryDB:
 
     def __init__(self):
         self.data = {}
-        self.value_counts = defaultdict(int)  # Для быстрого COUNTS
+        self.value_counts = defaultdict(int)
 
     def set(self, key, value):
         old_value = self.data.get(key)
@@ -125,7 +125,6 @@ class TransactionalDB(AbstractDatabase):
             self.transactions[-1][key] = value
 
     def get(self, key):
-        # Ищем в транзакциях (от последней к первой)
         for changes in reversed(self.transactions):
             if key in changes:
                 return changes[key] if changes[key] is not None else "NULL"
@@ -135,7 +134,7 @@ class TransactionalDB(AbstractDatabase):
         if not self.transactions:
             self.base.unset(key)
         else:
-            self.transactions[-1][key] = None  # Помечаем как удаленное
+            self.transactions[-1][key] = None 
 
     def count(self, value):
         count = self.base.count(value)
