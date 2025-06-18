@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Union, DefaultDict
+from typing import Any, Dict, List, Optional, Union, DefaultDict, final
 from collections import defaultdict
 
 from src.enums.enums import NULL
@@ -113,8 +113,8 @@ class InMemoryDB:
     @staticmethod
     def end() -> None:
         exit()
-
-class TransactionalDB:
+@final
+class TransactionalDB(AbstractDatabase):
     def __init__(self):
         self.base = InMemoryDB()
         self.transactions = []

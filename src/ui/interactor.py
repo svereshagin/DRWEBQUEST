@@ -1,6 +1,6 @@
 from src.enums.enums import Command
 from rich import print
-from src.utils.db import AbstractDatabase
+from src.database.db import AbstractDatabase
 from src.utils.help import help_instructions
 
 
@@ -47,7 +47,7 @@ class InterActor:
         if len(self.params) != arg_count:
             print(f"Ошибка: команда {self.command.value} требует {arg_count} аргументов")
             return
-        result = handler(*self.params)
+        result: bool = handler(*self.params)
 
         if should_print:
             print(result)

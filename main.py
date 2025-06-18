@@ -1,15 +1,12 @@
 import typer
 from rich import print
-from src.utils.db import TransactionalDB
-from src.utils.interactor import InterActor
-
+from src.database.db import TransactionalDB
+from src.ui.interactor import InterActor
+from src.utils.help import welcome_user
 
 
 def main():
-    print("[green]This is a DataBase sample[/green]\n",
-                    "[pink]Write 'HELP' to get a help message[/pink]\n",
-                    "[white]Write any possible command for test reason[/white]\n",)
-    
+    welcome_user()
     actor = InterActor(database = TransactionalDB())
     while True:
         raw_string = input("> ")
