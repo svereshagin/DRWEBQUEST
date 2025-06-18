@@ -1,5 +1,6 @@
 from src.enums.enums import Command
 from rich import print
+from src.utils.db import AbstractDatabase
 from src.utils.help import help_instructions
 
 
@@ -8,19 +9,22 @@ class InterActor:
         """
         :param database: 
         """
-        self.database = database
+        self.database: AbstractDatabase = database
 
-        self.command = ''
-        self.params = []
+        self.command: str = ''
+        self.params: list[str] = []
 
-        self.handlers = {
+        self.handlers: dict[Command, tuple] = {
             Command.SET: (2, self.database.set, False),
             Command.GET: (1, self.database.get, True),
             Command.UNSET: (1, self.database.unset, False),
             Command.FIND: (1, self.database.find, True),
             Command.COUNT: (1, self.database.count, True),
             Command.END: (0, self.database.end, False),
-            Command.HELP: (0, help_instructions, True)
+            Command.HELP: (0, help_instructions, True),
+            Command.BEGIN:(0, self.database.begin, False),
+            Command.ROLLBACK:(0, self.database.rollback, False),
+            Command.COMMIT:(0, self.database.commit, False),
         }
 
     def get_raw_input(self, raw_string: str) -> None:

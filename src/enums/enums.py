@@ -10,8 +10,10 @@ class Command(Enum):
     COUNT = 'COUNT'
     END = 'END'
     HELP = 'HELP'
-    
+    BEGIN = 'BEGIN'
+    ROLLBACK = 'ROLLBACK'
+    COMMIT = 'COMMIT'
     
 @dataclasses.dataclass
 class NULL:
-    NULL = 'Null'
+    NULL = 'NULL'

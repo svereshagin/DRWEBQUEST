@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Dict, List, Optional, Union, DefaultDict
 from collections import defaultdict
 
 from src.enums.enums import NULL
@@ -7,134 +7,173 @@ from src.enums.enums import NULL
 
 class AbstractDatabase(ABC):
     @abstractmethod
-    def set(self, key, value) -> None :
+    def set(self, key: str, value: str) -> None:
         """
         сохраняет аргумент в базе данных
-        :return: 
+        :param key: ключ для сохранения
+        :param value: значение для сохранения
+        :return: None
         """
         pass
 
     @abstractmethod
-    def get(self, key) -> Any:
+    def get(self, key: str) -> Union[str, NULL]:
         """
         возвращает, ранее сохраненную переменную. Если такой переменной
         не было сохранено, возвращает NULL
-        :return: 
+        :param key: ключ для поиска
+        :return: значение или NULL
         """
         pass
-    
+
     @abstractmethod
-    def unset(self, key) -> None:
+    def unset(self, key: str) -> None:
         """
         удаляет, ранее установленную переменную. Если значение не было
         установлено, не делает ничего.
-
-        :return: 
+        :param key: ключ для удаления
+        :return: None
         """
         pass
-    
+
     @abstractmethod
-    def count(self, value) -> None :
+    def count(self, value: str) -> int:
         """
         показывает сколько раз данные значение встречается в базе данных.
-        :return: 
+        :param value: значение для подсчета
+        :return: количество совпадений
         """
         pass
+
     @abstractmethod
-    def find(self, value) -> None :
+    def find(self, value: str) -> str:
         """
         выводит найденные установленные переменные для данного значения.
-        :return: 
+        :param value: значение для поиска
+        :return: строку с ключами через пробел
         """
         pass
 
     @staticmethod
     @abstractmethod
-    def end() -> None :
+    def end() -> None:
         """
         закрывает приложение.
-        :return: 
+        :return: None
         """
         pass
     
+    @abstractmethod
+    def begin(self) -> None:
+        """
+        начинает транзакцию
+        :return: 
+        """
+        pass
+    @abstractmethod
+    def rollback(self) -> None:
+        """
+        откатывает транзакцию назад
+        :return: 
+        """
+    @abstractmethod
+    def commit(self) -> None:
+        """
+        подтверждает изменения
+        :return: 
+        """
     
-
-
-class Database(AbstractDatabase):
+class InMemoryDB:
+    """Простое хранилище ключ-значение (без транзакций)"""
     def __init__(self):
-        self.data = defaultdict(str)
-        
-    def set(self, key, value) -> None :
+        self.data = {}
+        self.value_counts = defaultdict(int)  # Для быстрого COUNTS
+
+    def set(self, key, value):
+        old_value = self.data.get(key)
+        if old_value is not None:
+            self.value_counts[old_value] -= 1
         self.data[key] = value
-    def unset(self, key) -> None :
-        del self.data[key]
-        
-    def get(self, key) -> Any:
-        return self.data[key] if bool(self.data[key]) else NULL.NULL
-        
-    def count(self, value) -> Any:
-        counter = 0
-        for key, value in self.data.items():
-            if value == value:
-                counter += 1
-        return counter
-    
-    def find(self, value) -> str:
-        variables = []
-        for key, value in self.data.items():
-            if value == value:
-                variables.append(key)
-        return ' '.join(variables)
+        self.value_counts[value] += 1
+
+    def get(self, key):
+        return self.data.get(key, "NULL")
+
+    def unset(self, key):
+        value = self.data.pop(key, None)
+        if value is not None:
+            self.value_counts[value] -= 1
+
+    def count(self, value):
+        return self.value_counts.get(value, 0)
+
+    def find(self, value):
+        return [k for k, v in self.data.items() if v == value]
     
     @staticmethod
-    def end():
+    def end() -> None:
         exit()
-
-
 
 class TransactionalDB:
     def __init__(self):
-        self.global_state = {}      # Глобальное состояние (после всех коммитов)
-        self.transaction_stack = [] # Стек активных транзакций
-
-    def begin(self):
-        """Создает новый уровень транзакции"""
-        # Новый уровень = копия текущего состояния
-        current_state = self.transaction_stack[-1] if self.transaction_stack else self.global_state
-        self.transaction_stack.append(dict(current_state))
+        self.base = InMemoryDB()
+        self.transactions = []
 
     def set(self, key, value):
-        """Запись значения (в текущую транзакцию)"""
-        if self.transaction_stack:
-            self.transaction_stack[-1][key] = value
+        if not self.transactions:
+            self.base.set(key, value)
         else:
-            self.global_state[key] = value
+            self.transactions[-1][key] = value
 
     def get(self, key):
-        """Чтение значения (из самой глубокой транзакции)"""
-        # Поиск сверху вниз (от последней транзакции к глобальному состоянию)
-        for i in range(len(self.transaction_stack)-1, -1, -1):
-            if key in self.transaction_stack[i]:
-                return self.transaction_stack[i][key]
-        return self.global_state.get(key, "NULL")
+        # Ищем в транзакциях (от последней к первой)
+        for changes in reversed(self.transactions):
+            if key in changes:
+                return changes[key] if changes[key] is not None else "NULL"
+        return self.base.get(key)
 
-    def rollback(self):
-        """Откат текущей транзакции"""
-        if self.transaction_stack:
-            self.transaction_stack.pop()
+    def unset(self, key):
+        if not self.transactions:
+            self.base.unset(key)
+        else:
+            self.transactions[-1][key] = None  # Помечаем как удаленное
+
+    def count(self, value):
+        count = self.base.counts(value)
+        for changes in self.transactions:
+            for k, v in changes.items():
+                if v == value:
+                    count += 1
+                elif v is None and self.base.get(k) == value:
+                    count -= 1
+        return count
+
+    def find(self, value):
+        base_result = set(k for k in self.base.find(value))
+        for changes in self.transactions:
+            for k, v in changes.items():
+                if v == value:
+                    base_result.add(k)
+                elif v is None:
+                    base_result.discard(k)
+        return sorted(base_result)
+
+    def begin(self):
+        self.transactions.append({})
 
     def commit(self):
-        """Фиксация текущей транзакции"""
-        if not self.transaction_stack:
+        if not self.transactions:
             return
+        changes = self.transactions.pop()
+        for key, value in changes.items():
+            if value is not None:
+                self.base.set(key, value)
+            else:
+                self.base.unset(key)
 
-        # Слияние изменений с родительским уровнем
-        current = self.transaction_stack.pop()
-
-        if self.transaction_stack:
-            # Обновляем родительскую транзакцию
-            self.transaction_stack[-1].update(current)
-        else:
-            # Фиксация в глобальное состояние
-            self.global_state.update(current)
-    
+    def rollback(self):
+        if self.transactions:
+            self.transactions.pop()
+    @staticmethod
+    def end() -> None:
+        exit()
