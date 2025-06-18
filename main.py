@@ -1,5 +1,4 @@
 import typer
-from rich import print
 from src.database.db import TransactionalDB
 from src.ui.interactor import InterActor
 from src.utils.help import welcome_user
