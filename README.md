@@ -1,4 +1,4 @@
-[![CI/CD Status](https://github.com/svereshagin/drwebquest/workflows/Python%20CI%CD/badge.svg)](https://github.com/svereshagin/drwebquest/actions)
+[![Python CI/CD](https://github.com/svereshagin/DRWEBQUEST/actions/workflows/python-ci.yml/badge.svg)](https://github.com/svereshagin/DRWEBQUEST/actions/workflows/python-ci.yml)
 [![Python Version](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/)
 
 ```markdown
