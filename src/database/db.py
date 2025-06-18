@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Union, DefaultDict, final
+from typing import Union, final
 from collections import defaultdict
 
 from src.enums.enums import NULL
@@ -14,7 +14,6 @@ class AbstractDatabase(ABC):
         :param value: значение для сохранения
         :return: None
         """
-        pass
 
     @abstractmethod
     def get(self, key: str) -> Union[str, NULL]:
@@ -24,7 +23,6 @@ class AbstractDatabase(ABC):
         :param key: ключ для поиска
         :return: значение или NULL
         """
-        pass
 
     @abstractmethod
     def unset(self, key: str) -> None:
@@ -34,7 +32,6 @@ class AbstractDatabase(ABC):
         :param key: ключ для удаления
         :return: None
         """
-        pass
 
     @abstractmethod
     def count(self, value: str) -> int:
@@ -43,7 +40,6 @@ class AbstractDatabase(ABC):
         :param value: значение для подсчета
         :return: количество совпадений
         """
-        pass
 
     @abstractmethod
     def find(self, value: str) -> str:
@@ -52,7 +48,6 @@ class AbstractDatabase(ABC):
         :param value: значение для поиска
         :return: строку с ключами через пробел
         """
-        pass
 
     @staticmethod
     @abstractmethod
@@ -61,7 +56,6 @@ class AbstractDatabase(ABC):
         закрывает приложение.
         :return: None
         """
-        pass
 
     @abstractmethod
     def begin(self) -> None:
@@ -69,7 +63,6 @@ class AbstractDatabase(ABC):
         начинает транзакцию
         :return:
         """
-        pass
 
     @abstractmethod
     def rollback(self) -> None:
