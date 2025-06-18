@@ -62,29 +62,33 @@ class AbstractDatabase(ABC):
         :return: None
         """
         pass
-    
+
     @abstractmethod
     def begin(self) -> None:
         """
         начинает транзакцию
-        :return: 
+        :return:
         """
         pass
+
     @abstractmethod
     def rollback(self) -> None:
         """
         откатывает транзакцию назад
-        :return: 
+        :return:
         """
+
     @abstractmethod
     def commit(self) -> None:
         """
         подтверждает изменения
-        :return: 
+        :return:
         """
-    
+
+
 class InMemoryDB:
     """Простое хранилище ключ-значение (без транзакций)"""
+
     def __init__(self):
         self.data = {}
         self.value_counts = defaultdict(int)  # Для быстрого COUNTS
@@ -109,10 +113,12 @@ class InMemoryDB:
 
     def find(self, value):
         return [k for k, v in self.data.items() if v == value]
-    
+
     @staticmethod
     def end() -> None:
         exit()
+
+
 @final
 class TransactionalDB(AbstractDatabase):
     def __init__(self):
@@ -174,6 +180,7 @@ class TransactionalDB(AbstractDatabase):
     def rollback(self):
         if self.transactions:
             self.transactions.pop()
+
     @staticmethod
     def end() -> None:
         exit()

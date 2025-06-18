@@ -7,11 +7,11 @@ from src.utils.help import help_instructions
 class InterActor:
     def __init__(self, database):
         """
-        :param database: 
+        :param database:
         """
         self.database: AbstractDatabase = database
 
-        self.command: str = ''
+        self.command: str = ""
         self.params: list[str] = []
 
         self.handlers: dict[Command, tuple] = {
@@ -22,9 +22,9 @@ class InterActor:
             Command.COUNT: (1, self.database.count, True),
             Command.END: (0, self.database.end, False),
             Command.HELP: (0, help_instructions, True),
-            Command.BEGIN:(0, self.database.begin, False),
-            Command.ROLLBACK:(0, self.database.rollback, False),
-            Command.COMMIT:(0, self.database.commit, False),
+            Command.BEGIN: (0, self.database.begin, False),
+            Command.ROLLBACK: (0, self.database.rollback, False),
+            Command.COMMIT: (0, self.database.commit, False),
         }
 
     def get_raw_input(self, raw_string: str) -> None:
@@ -38,14 +38,15 @@ class InterActor:
             print(f"Неизвестная команда: {parts[0]}")
             self.command = None
 
-
     def action(self):
         if not self.command:
             return
         arg_count, handler, should_print = self.handlers[self.command]
 
         if len(self.params) != arg_count:
-            print(f"Ошибка: команда {self.command.value} требует {arg_count} аргументов")
+            print(
+                f"Ошибка: команда {self.command.value} требует {arg_count} аргументов"
+            )
             return
         result: bool = handler(*self.params)
 
