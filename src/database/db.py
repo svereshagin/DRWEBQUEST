@@ -139,7 +139,7 @@ class TransactionalDB(AbstractDatabase):
             self.transactions[-1][key] = None  # Помечаем как удаленное
 
     def count(self, value):
-        count = self.base.counts(value)
+        count = self.base.count(value)
         for changes in self.transactions:
             for k, v in changes.items():
                 if v == value:
