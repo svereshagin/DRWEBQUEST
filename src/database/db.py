@@ -134,7 +134,7 @@ class TransactionalDB(AbstractDatabase):
         if not self.transactions:
             self.base.unset(key)
         else:
-            self.transactions[-1][key] = None 
+            self.transactions[-1][key] = None
 
     def count(self, value):
         count = self.base.count(value)
