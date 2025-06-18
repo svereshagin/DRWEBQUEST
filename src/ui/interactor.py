@@ -52,4 +52,3 @@ class InterActor:
 
         if should_print:
             print(result)
-
