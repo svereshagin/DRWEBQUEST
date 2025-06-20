@@ -2,7 +2,6 @@
 [![Python Version](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/)
 
 
-```markdown
 # DRWEBQUEST - In-Memory Database with Transaction Support
 
 Python implementation of a test task for Dr.Web.  
