@@ -1,104 +1,107 @@
 [![Python CI/CD](https://github.com/svereshagin/DRWEBQUEST/actions/workflows/python-ci.yml/badge.svg)](https://github.com/svereshagin/DRWEBQUEST/actions/workflows/python-ci.yml)
 [![Python Version](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/)
 
+
 ```markdown
-# DRWEBQUEST
+# DRWEBQUEST - In-Memory Database with Transaction Support
 
-Python реализация тестового задания для Dr.Web.  
-Консольное приложение - база данных в памяти с поддержкой транзакций.
-```
-## 🚀 Установка
-___
-# Для Linux/Windows:
+Python implementation of a test task for Dr.Web.  
+A console application representing an in-memory database with transaction support.
+
+## Table of Contents
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Command Reference](#command-reference)
+- [Examples](#examples)
+- [Technical Implementation](#technical-implementation)
+- [Limitations](#limitations)
+
+## Features
+- Key-value storage in memory
+- Transaction support with nesting
+- Atomic commit/rollback operations
+- Fast value counting and searching
+
+## Installation
+
+### Prerequisites
+- Python 3.12+
+
+### Installation Steps
 ```bash
+# For Linux/Windows:
 pip install -r requirements.txt
-```
 
-# Для MacOS:
-```bash
+# For MacOS:
 pip3 install -r requirements.txt
 ```
-___
-## ▶️ Запуск
 
+## Usage
 ```bash
 # Linux/Windows:
 python main.py
-```
-```bash
+
 # MacOS:
 python3 main.py
 ```
 
-## 📋 Описание задачи
+## Command Reference
 
-Интерактивное консольное приложение, имитирующее интерфейс базы данных.  
-Данные хранятся в оперативной памяти и не сохраняются между сеансами.
+| Command    | Syntax               | Description                                  |
+|------------|----------------------|----------------------------------------------|
+| SET        | `SET <key> <value>`  | Stores the value for specified key           |
+| GET        | `GET <key>`          | Retrieves value for key or NULL              |
+| UNSET      | `UNSET <key>`        | Removes the key from storage                 |
+| COUNTS     | `COUNTS <value>`     | Returns count of keys with specified value   |
+| FIND       | `FIND <value>`       | Returns all keys with specified value        |
+| BEGIN      | `BEGIN`              | Starts new transaction block                 |
+| ROLLBACK   | `ROLLBACK`           | Cancels current transaction changes          |
+| COMMIT     | `COMMIT`             | Applies current transaction changes          |
+| END        | `END`                | Terminates the application                   |
 
-### 🔧 Команды
+## Examples
 
-| Команда    | Описание                                                                 |
-|------------|--------------------------------------------------------------------------|
-| `SET`      | Сохраняет значение по ключу (`SET key value`)                           |
-| `GET`      | Возвращает значение по ключу или `NULL` (`GET key`)                     |
-| `UNSET`    | Удаляет ключ (`UNSET key`)                                              |
-| `COUNTS`   | Показывает количество вхождений значения (`COUNTS value`)               |
-| `FIND`     | Выводит все ключи с указанным значением (`FIND value`)                  |
-| `BEGIN`    | Начинает новую транзакцию                                               |
-| `ROLLBACK` | Откатывает текущую транзакцию                                           |
-| `COMMIT`   | Применяет изменения текущей транзакции                                  |
-| `END`      | Завершает работу приложения                                             |
-
-### 🔄 Транзакции
-- Поддерживают **вложенность**
-- Изменения применяются только после `COMMIT`
-- `ROLLBACK` отменяет изменения текущей транзакции
-
-## 📝 Примеры использования
-
-### Базовые операции
+### Basic Operations
 ```bash
-> GET A
-NULL
-> SET A 10
-> GET A
-10
-> COUNTS 10
+> SET user:1 "John Doe"
+> GET user:1
+"John Doe"
+> COUNTS "John Doe"
 1
-> SET B 20
-> FIND 20
-B
-> UNSET B
-> GET B
+> FIND "John Doe"
+user:1
+> UNSET user:1
+> GET user:1
 NULL
-> END
 ```
 
-### Работа с транзакциями
+### Transaction Handling
 ```bash
 > BEGIN
-> SET A 10
+> SET balance 100
 > BEGIN
-> SET A 20
-> GET A
-20
+> SET balance 150
+> GET balance
+150
 > ROLLBACK
-> GET A
-10
+> GET balance
+100
 > COMMIT
-> GET A
-10
-> END
+> GET balance
+100
 ```
 
-## 🛠️ Техническая реализация
-- **Хранение данных**: словарь Python + `defaultdict` для быстрого подсчета значений
-- **Транзакции**: стек изменений с возможностью отката
-- **Обработка ввода**: построчное чтение команд с поддержкой `EOF` (Ctrl+D/Ctrl+Z)
+## Technical Implementation
+- **Data Storage**: Python dictionary with defaultdict for value counting
+- **Transactions**: Stack-based change tracking with rollback capability
+- **Input Processing**: Line-based command parsing with EOF support
+- **Performance**: O(1) for GET/SET/UNSET operations
 
-## 📌 Особенности
-- Все аргументы команд **не содержат пробелов**
-- Одна строка = одна команда
-- Приложение завершается по команде `END` 
-
+## Limitations
+- No persistent storage between sessions
+- No support for spaces in keys/values
+- Single-threaded implementation
+- No network access or remote connections
 ```
+
